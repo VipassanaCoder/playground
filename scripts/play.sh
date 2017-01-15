@@ -1,8 +1,5 @@
 #!/bin/bash
-
 source "$(dirname $(realpath $0))/paths.sh"
-
-QUIET=0
 
 function print-help() {
   printf "Usage: $0 [options]\n\n" >&2
@@ -32,19 +29,13 @@ function print-help() {
   printf "    %-15s each time a source file changes.\n\n" >&2
 }
 
+QUIET=0
+
 function log() {
   if [[ $QUIET == 1 ]]; then
     return
   fi
   echo $@ >&2
-}
-
-function line-count() {
-  echo $1 | wc -l | sed 's/ //g'
-}
-
-function get-line() {
-  cat - | head -n $((($1+1))) | tail -n 1
 }
 
 function template-path() {

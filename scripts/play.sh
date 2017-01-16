@@ -124,7 +124,6 @@ function run-playground() {
 }
 
 function watch-playground() {
-  local sources=$(list-playground-source-files $1)
   $SCRIPTSDIR/watch.sh $1 "$(list-playground-source-files $1)"
 }
 
@@ -218,7 +217,7 @@ if [[ "$(playground-exists $PLAYGROUND)" == 0 ]]; then
     log "Playground '$PLAYGROUND' does not exist. Use -n to create it."
     exit 1
   else
-    log "Please specify a playground name with -p." >&2
+    log "Please specify a playground name with -p."
     exit 1
   fi
 elif [[ "$NEW" == 1 ]]; then

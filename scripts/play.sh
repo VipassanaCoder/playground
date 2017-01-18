@@ -98,10 +98,11 @@ function make-playground() {
 
 function build-playground() {
   local sources="$(list-playground-source-files $1 | paste -sd ' ' -)"
-  go build -o "$(playground-build-path $1)" $sources
-  local code=$!
-  if [[ $code > 0 ]]; then
-    print "Build failed with exit code $code. Exiting..."
+  err=$(go build -o "$(playground-build-path $1)" $sources 2>&1 1>/dev/null)
+  local code=$?
+  if [[ "$code" != 0 ]]; then
+    printf "Build failed with exit code $code:\n" >&2
+    printf "$err" | awk '/^[^#]/ { print $0 }' | awk '{ print "    " $0 }' >&2
     exit $code
   fi
 }
@@ -113,12 +114,10 @@ function run-playground() {
     log "Playground $1 has not been built yet. Use -b to build it, or -R to automatically build and run playgrounds in the future."
     exit 1
   fi
-
   eval $p
-  local code=$!
-
+  local code=$?
   if [[ $code > 0 ]]; then
-    log "Build failed with exit code $code. Exiting..."
+    log "Playground failed with exit code $code. Exiting..."
     exit $code
   fi
 }
@@ -267,29 +266,36 @@ fi
 
 if [[ "$BUILD" == 1 ]]; then
   if [[ $QUIET == 0 || $FROMWATCH == 1 ]]; then
-    printf "Building playground... "
+    printf "Building playground...\n" >&2
   fi
-  build-playground $PLAYGROUND
+
+  $(build-playground $PLAYGROUND)
+  res=$?
+  if [[ $res != 0 ]]; then
+    printf "\n" >&2
+    exit $res
+  fi
+
   if [[ $QUIET == 0 || $FROMWATCH == 1 ]]; then
-    printf "Done.\n"
+    printf "Done.\n" >&2
   fi
   log "Success."
 fi
 
 if [[ "$RUN" == 1 ]]; then
   if [[ $QUIET == 0 || $FROMWATCH == 1 ]]; then
-    printf "Running playground...\n --- \n"
+    printf "Running playground...\n --- \n" >&2
   fi
   run-playground $PLAYGROUND
   if [[ $QUIET == 0 || $FROMWATCH == 1 ]]; then
-    printf " ---\n"
+    printf " ---\n" >&2
   fi
   log "Success."
 fi
 
 if [[ "$WATCH" == 1 ]]; then
   if [[ $QUIET == 0 ]]; then
-    printf "Watching playground...\n"
+    printf "Watching playground...\n" >&2
   fi
   watch-playground $PLAYGROUND
 fi

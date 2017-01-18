@@ -284,11 +284,11 @@ fi
 
 if [[ "$RUN" == 1 ]]; then
   if [[ $QUIET == 0 || $FROMWATCH == 1 ]]; then
-    printf "Running playground...\n --- \n" >&2
+    printf "Running playground...\n --- \n\n" >&2
   fi
   run-playground $PLAYGROUND
   if [[ $QUIET == 0 || $FROMWATCH == 1 ]]; then
-    printf " ---\n" >&2
+    printf "\n ---\n\n" >&2
   fi
   log "Success."
 fi

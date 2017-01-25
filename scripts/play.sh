@@ -114,7 +114,15 @@ function run-playground() {
     log "Playground $1 has not been built yet. Use -b to build it, or -R to automatically build and run playgrounds in the future."
     exit 1
   fi
-  eval $p
+
+  local cmd="$p"
+
+  local pp="$GOPATH/bin/pp"
+  if [[ -x $pp ]]; then
+    cmd="$p 2>&1 | $pp"
+  fi
+
+  eval "$cmd"
   local code=$?
   if [[ $code > 0 ]]; then
     log "Playground failed with exit code $code. Exiting..."
